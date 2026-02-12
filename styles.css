@@ -1,0 +1,215 @@
+:root {
+  --bg1: #ff4fa0;
+  --bg2: #ff8fc6;
+  --card: rgba(255, 255, 255, 0.92);
+  --text: #2b2b2b;
+  --shadow: 0 18px 60px rgba(0, 0, 0, 0.18);
+  --radius: 22px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica,
+    Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  color: var(--text);
+  background: radial-gradient(1200px 900px at 30% 20%, #ffd1e6 0%, transparent 55%),
+    linear-gradient(135deg, var(--bg1), var(--bg2));
+  overflow: hidden;
+}
+
+body.accepted {
+  --bg1: #7c3aed;
+  --bg2: #ec4899;
+}
+
+body.accepted-bg {
+  background: url('images/Valentine_BG.jpg') center/contain no-repeat;
+  background-size: 70% auto;
+}
+
+.hearts-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.stage {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  position: relative;
+  z-index: 1;
+}
+
+.card {
+  width: min(520px, 92vw);
+  background: transparent;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 34px 26px 26px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transform: translateY(-40px);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(28px, 4.2vw, 40px);
+  letter-spacing: 0.2px;
+}
+
+.question {
+  margin: 10px 0 22px;
+  font-size: clamp(16px, 2.3vw, 20px);
+  opacity: 0.9;
+}
+
+.buttons {
+  position: relative;
+  width: min(440px, 86vw);
+  height: 140px;
+  margin: 0 auto;
+}
+
+.btn {
+  position: absolute;
+  top: 76px;
+  min-width: 150px;
+  height: 48px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 120ms ease, filter 120ms ease;
+  will-change: transform;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-yes {
+  left: 0;
+  background: #22c55e;
+  color: white;
+  box-shadow: 0 10px 24px rgba(34, 197, 94, 0.38);
+}
+
+.btn-yes:hover {
+  filter: brightness(1.03);
+}
+
+.btn-no {
+  right: 0;
+  background: #ef4444;
+  color: white;
+  box-shadow: 0 10px 24px rgba(239, 68, 68, 0.32);
+}
+
+.response {
+  margin: 18px 0 0;
+  min-height: 28px;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.excited-gif {
+  display: none;
+  max-width: 80%;
+  max-height: 200px;
+  margin: 0 auto 20px;
+  border-radius: 12px;
+}
+
+body.accepted .title,
+body.accepted .question {
+  display: none;
+}
+
+body.accepted .excited-gif {
+  display: block;
+}
+
+.fx-burst {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.fx-spark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: hsl(var(--h) 90% 60%);
+  transform: translate(-50%, -50%);
+  animation: sparkPop 700ms ease-out forwards;
+  box-shadow: 0 0 12px hsla(var(--h), 90%, 60%, 0.65);
+}
+
+@keyframes sparkPop {
+  0% {
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(var(--dx) * 1px), calc(var(--dy) * 1px)) scale(0.2);
+    opacity: 0;
+  }
+}
+
+.heart {
+  position: absolute;
+  left: 50%;
+  bottom: -40px;
+  transform: translateX(-50%);
+  font-size: 22px;
+  opacity: 0.95;
+  animation: floatUp 6s linear forwards;
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.2));
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translate(var(--x), 0) scale(var(--s));
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(var(--x), -110vh) scale(var(--s));
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heart {
+    animation: none;
+    display: none;
+  }
+  .btn {
+    transition: none;
+  }
+}

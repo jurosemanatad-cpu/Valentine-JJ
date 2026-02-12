@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Valentine Proposal</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="hearts-layer" id="heartsLayer" aria-hidden="true"></div>
+
+    <main class="stage">
+      <section class="card" aria-label="Valentine proposal card">
+        <h1 class="title" id="titleText">Hi Crush</h1>
+        <p class="question" id="questionText">Will you be my Valentine?</p>
+
+        <img src="images/Excited.gif" id="excitedGif" class="excited-gif" alt="Excited" />
+
+        <div class="buttons" id="buttonsArea">
+          <button class="btn btn-yes" id="yesBtn" type="button">Yes</button>
+          <button class="btn btn-no" id="noBtn" type="button">No</button>
+        </div>
+
+        <p class="response" id="response" role="status" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
