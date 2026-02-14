@@ -5,8 +5,8 @@ const buttonsArea = document.getElementById("buttonsArea");
 const heartsLayer = document.getElementById("heartsLayer");
 
 const YES_GROW = {
-  step: 0.18,
-  max: 2.2,
+  step: 0.5,
+  max: 100,
   hideNoAt: 1.8,
 };
 
@@ -30,14 +30,44 @@ function isCoarsePointer() {
 
 function moveNoButton() {
   const areaRect = buttonsArea.getBoundingClientRect();
-  const btnRect = noBtn.getBoundingClientRect();
+  const noBtnRect = noBtn.getBoundingClientRect();
+  const yesBtnRect = yesBtn.getBoundingClientRect();
+
+  // IMPORTANT: Account for the scale of the growing button
+  const scaledWidth = yesBtnRect.width;
+  const scaledHeight = yesBtnRect.height;
+  const yesCenter = {
+    x: yesBtnRect.left + scaledWidth / 2,
+    y: yesBtnRect.top + scaledHeight / 2
+  };
 
   const padding = 8;
-  const limitX = Math.max(padding, areaRect.width - btnRect.width - padding);
-  const limitY = Math.max(padding, areaRect.height - btnRect.height - padding);
+  const limitX = Math.max(padding, areaRect.width - noBtnRect.width - padding);
+  const limitY = Math.max(padding, areaRect.height - noBtnRect.height - padding);
 
-  const x = clamp(Math.random() * limitX, padding, limitX);
-  const y = clamp(Math.random() * limitY, padding, limitY);
+  let x, y, attempts = 0;
+  let overlapping = true;
+
+  while (overlapping && attempts < 50) {
+    x = clamp(Math.random() * limitX, padding, limitX);
+    y = clamp(Math.random() * limitY, padding, limitY);
+
+    const proposedRect = {
+      left: x + areaRect.left,
+      right: x + areaRect.left + noBtnRect.width,
+      top: y + areaRect.top,
+      bottom: y + areaRect.top + noBtnRect.height
+    };
+
+    const buffer = 20; 
+    overlapping = !(
+      proposedRect.right < yesBtnRect.left - buffer ||
+      proposedRect.left > yesBtnRect.right + buffer ||
+      proposedRect.bottom < yesBtnRect.top - buffer ||
+      proposedRect.top > yesBtnRect.bottom + buffer
+    );
+    attempts++;
+  }
 
   noBtn.style.left = x + "px";
   noBtn.style.top = y + "px";
@@ -45,11 +75,17 @@ function moveNoButton() {
 }
 
 function growYesAndMaybeHideNo() {
-  yesScale = Math.min(YES_GROW.max, yesScale + YES_GROW.step);
-  yesBtn.style.transform = `scale(${yesScale})`;
-
-  if (yesScale >= YES_GROW.hideNoAt) {
-    noBtn.style.display = "none";
+  yesScale += YES_GROW.step;
+  yesBtn.style.transform = `translateX(-50%) scale(${yesScale})`;
+  
+  if (yesScale > 20) {
+    yesBtn.style.width = "100vw";
+    yesBtn.style.height = "100vh";
+    yesBtn.style.borderRadius = "0";
+    yesBtn.style.top = "0";
+    yesBtn.style.left = "0";
+    yesBtn.style.transform = "none";
+    yesBtn.click(); // Auto-trigger success when it's huge
   }
 }
 
@@ -104,27 +140,20 @@ function startContinuousFireworks() {
   }, 800);
 }
 
-// Desktop hover
-noBtn.addEventListener("mouseenter", moveNoButton);
-
-// Cross-device: pointer events (covers mouse + touch + pen)
-noBtn.addEventListener("pointerenter", moveNoButton);
-noBtn.addEventListener("pointerdown", (e) => {
+// Interaction: Force mobile-style behavior on all devices
+noBtn.addEventListener("click", (e) => {
   e.preventDefault();
-  if (isCoarsePointer()) growYesAndMaybeHideNo();
+  growYesAndMaybeHideNo();
   moveNoButton();
 });
 
-// Fallback for older mobile browsers
-noBtn.addEventListener("touchstart", (e) => {
-  e.preventDefault();
-  moveNoButton();
-});
+// Remove mouseenter/hover behavior to strictly use click-to-move
+noBtn.removeEventListener("mouseenter", moveNoButton);
+noBtn.removeEventListener("pointerenter", moveNoButton);
 
 yesBtn.addEventListener("click", () => {
   document.body.classList.add("accepted");
   document.body.classList.add("accepted-bg");
-  response.textContent = "YAYYY!! 💕";
   buttonsArea.style.display = "none";
   startContinuousFireworks();
 });
