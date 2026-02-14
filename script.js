@@ -15,6 +15,16 @@ const NO_SHRINK = {
   min: 0.2,
 };
 
+const CAT_IMAGES = [
+  "images/cat1.jpg",
+  "images/cat2.png",
+  "images/cat3.png",
+  "images/cat4.png",
+  "images/cat5.jpg",
+  "images/cat6.jpg",
+  "images/cat7.gif"
+];
+
 const FIREWORKS = {
   maxBursts: 30,
 };
@@ -39,38 +49,30 @@ function moveNoButton() {
   const noBtnRect = noBtn.getBoundingClientRect();
   const yesBtnRect = yesBtn.getBoundingClientRect();
 
-  // IMPORTANT: Account for the scale of the growing button
-  const scaledWidth = yesBtnRect.width;
-  const scaledHeight = yesBtnRect.height;
-  const yesCenter = {
-    x: yesBtnRect.left + scaledWidth / 2,
-    y: yesBtnRect.top + scaledHeight / 2
-  };
+  // Switch to absolute for random movement
+  noBtn.style.position = "absolute";
 
-  const padding = 8;
-  const limitX = Math.max(padding, areaRect.width - noBtnRect.width - padding);
-  const limitY = Math.max(padding, areaRect.height - noBtnRect.height - padding);
+  const padding = 10;
+  // Calculate limits within the buttonsArea
+  const limitX = areaRect.width - noBtnRect.width - padding;
+  const limitY = areaRect.height - noBtnRect.height - padding;
 
   let x, y, attempts = 0;
   let overlapping = true;
 
-  while (overlapping && attempts < 50) {
+  while (overlapping && attempts < 100) {
     x = clamp(Math.random() * limitX, padding, limitX);
     y = clamp(Math.random() * limitY, padding, limitY);
 
-    const proposedRect = {
-      left: x + areaRect.left,
-      right: x + areaRect.left + noBtnRect.width,
-      top: y + areaRect.top,
-      bottom: y + areaRect.top + noBtnRect.height
-    };
+    const buffer = 15;
+    const proposedLeft = x + areaRect.left;
+    const proposedTop = y + areaRect.top;
 
-    const buffer = 20; 
     overlapping = !(
-      proposedRect.right < yesBtnRect.left - buffer ||
-      proposedRect.left > yesBtnRect.right + buffer ||
-      proposedRect.bottom < yesBtnRect.top - buffer ||
-      proposedRect.top > yesBtnRect.bottom + buffer
+      proposedLeft + noBtnRect.width < yesBtnRect.left - buffer ||
+      proposedLeft > yesBtnRect.right + buffer ||
+      proposedTop + noBtnRect.height < yesBtnRect.top - buffer ||
+      proposedTop > yesBtnRect.bottom + buffer
     );
     attempts++;
   }
@@ -78,6 +80,7 @@ function moveNoButton() {
   noBtn.style.left = x + "px";
   noBtn.style.top = y + "px";
   noBtn.style.right = "auto";
+  noBtn.style.margin = "0"; // Remove flex margins if any
 }
 
 function growYesAndShrinkNo() {
@@ -149,9 +152,30 @@ function startContinuousFireworks() {
   }, 800);
 }
 
+function spawnCat(x, y) {
+  const cat = document.createElement("img");
+  const randomImg = CAT_IMAGES[Math.floor(Math.random() * CAT_IMAGES.length)];
+  cat.src = randomImg;
+  cat.className = "cat-stamp";
+  
+  // Center the 40px image on the click point
+  cat.style.left = (x - 20) + "px";
+  cat.style.top = (y - 20) + "px";
+  
+  buttonsArea.appendChild(cat);
+}
+
 // Interaction: Force mobile-style behavior on all devices
 noBtn.addEventListener("click", (e) => {
   e.preventDefault();
+  
+  // Get current position before moving
+  const rect = noBtn.getBoundingClientRect();
+  const areaRect = buttonsArea.getBoundingClientRect();
+  const clickX = rect.left - areaRect.left + rect.width / 2;
+  const clickY = rect.top - areaRect.top + rect.height / 2;
+  
+  spawnCat(clickX, clickY);
   growYesAndShrinkNo();
   moveNoButton();
 });
@@ -164,6 +188,11 @@ yesBtn.addEventListener("click", () => {
   document.body.classList.add("accepted");
   document.body.classList.add("accepted-bg");
   buttonsArea.style.display = "none";
+  
+  // Remove all cat stamps
+  const cats = document.querySelectorAll(".cat-stamp");
+  cats.forEach(c => c.remove());
+  
   startContinuousFireworks();
 });
 
