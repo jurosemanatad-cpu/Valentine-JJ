@@ -5,9 +5,14 @@ const buttonsArea = document.getElementById("buttonsArea");
 const heartsLayer = document.getElementById("heartsLayer");
 
 const YES_GROW = {
-  step: 0.5,
+  step: 0.2,
   max: 100,
   hideNoAt: 1.8,
+};
+
+const NO_SHRINK = {
+  step: 0.1,
+  min: 0.2,
 };
 
 const FIREWORKS = {
@@ -15,6 +20,7 @@ const FIREWORKS = {
 };
 
 let yesScale = 1;
+let noScale = 1;
 
 function clamp(n, min, max) {
   return Math.max(min, Math.min(max, n));
@@ -74,9 +80,12 @@ function moveNoButton() {
   noBtn.style.right = "auto";
 }
 
-function growYesAndMaybeHideNo() {
+function growYesAndShrinkNo() {
   yesScale += YES_GROW.step;
-  yesBtn.style.transform = `translateX(-50%) scale(${yesScale})`;
+  noScale = Math.max(NO_SHRINK.min, noScale - NO_SHRINK.step);
+
+  yesBtn.style.transform = `scale(${yesScale})`;
+  noBtn.style.transform = `scale(${noScale})`;
   
   if (yesScale > 20) {
     yesBtn.style.width = "100vw";
@@ -143,7 +152,7 @@ function startContinuousFireworks() {
 // Interaction: Force mobile-style behavior on all devices
 noBtn.addEventListener("click", (e) => {
   e.preventDefault();
-  growYesAndMaybeHideNo();
+  growYesAndShrinkNo();
   moveNoButton();
 });
 
